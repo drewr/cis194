@@ -36,3 +36,14 @@ hanoi :: Integer -> Peg -> Peg -> Peg -> [Move]
 hanoi 0 _ _ _ = []
 hanoi 1 a b _ = [(a, b)]
 hanoi n a b c = concat [(hanoi (n - 1) a c b), (hanoi 1 a b c), (hanoi (n - 1) c b a)]
+
+-- Buggy, still generates too many moves
+hanoi2 :: Integer -> Peg -> Peg -> Peg -> Peg -> [Move]
+hanoi2 0 _ _ _  _  = []
+hanoi2 1 a b _  _  = [(a, b)]
+hanoi2 2 a b t1 _  = [(a, t1), (a, b), (t1, b)]
+hanoi2 n a b t1 t2 = concat [(hanoi2 (n - 2) a t2 t1 b),
+                             (hanoi2 1 a t1 b t2),
+                             (hanoi2 1 a b t1 t2),
+                             (hanoi2 1 t1 b a t2),
+                             (hanoi2 (n - 2) t2 b t1 a)]
