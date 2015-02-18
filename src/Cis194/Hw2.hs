@@ -88,4 +88,4 @@ getMsg :: LogMessage -> String
 getMsg (LogMessage _ _ msg) = msg
 
 whatWentWrong :: [LogMessage] -> [String]
-whatWentWrong logs = map getMsg $ filter bad $ inOrder $ build logs
+whatWentWrong = map getMsg . filter bad . inOrder . build
