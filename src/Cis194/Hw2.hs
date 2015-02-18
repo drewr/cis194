@@ -2,7 +2,10 @@
 
 module Cis194.Hw2 where
 
-import Log (LogMessage(..), MessageType(..), testParse)
+import Log ( LogMessage(..)
+           , MessageType(..)
+           , testParse
+           , MessageTree(..))
 import Text.ParserCombinators.Parsec
 import Control.Applicative hiding ((<|>))
 
@@ -50,3 +53,24 @@ parseMessage m =
 
 parse :: String -> [LogMessage]
 parse = map parseMessage . lines
+
+insert :: LogMessage -> MessageTree -> MessageTree
+insert (Unknown _) tree = tree
+insert msg Leaf = Node Leaf msg Leaf
+insert (log @ (LogMessage _ t1 _)) (tree@(Node Leaf (LogMessage _ t2 _) Leaf)) =
+  if t1 <= t2
+  then Node Leaf log tree
+  else Node tree log Leaf
+insert (log @ (LogMessage _ t1 _)) (Node left (node@(LogMessage _ t2 _)) right) =
+  if t1 <= t2
+  then Node (insert log left) node right
+  else Node left node (insert log right)
+
+build :: [LogMessage] -> MessageTree
+build = foldr insert Leaf
+
+inOrder :: MessageTree -> [LogMessage]
+inOrder Leaf = []
+inOrder (Node Leaf msg right) = [msg] ++ inOrder right
+inOrder (Node left msg Leaf) = inOrder left ++ [msg]
+inOrder (Node left msg right) = inOrder left ++ [msg] ++ inOrder right
