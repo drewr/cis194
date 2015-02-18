@@ -4,8 +4,10 @@ module Cis194.Hw2 where
 
 import Log ( LogMessage(..)
            , MessageType(..)
+           , MessageTree(..)
            , testParse
-           , MessageTree(..))
+           , testWhatWentWrong
+           )
 import Text.ParserCombinators.Parsec
 import Control.Applicative hiding ((<|>))
 
@@ -74,3 +76,16 @@ inOrder Leaf = []
 inOrder (Node Leaf msg right) = [msg] ++ inOrder right
 inOrder (Node left msg Leaf) = inOrder left ++ [msg]
 inOrder (Node left msg right) = inOrder left ++ [msg] ++ inOrder right
+
+bad :: LogMessage -> Bool
+bad (LogMessage (Error severity) _ _) =
+  if severity > 50
+  then True
+  else False
+bad _ = False
+
+getMsg :: LogMessage -> String
+getMsg (LogMessage _ _ msg) = msg
+
+whatWentWrong :: [LogMessage] -> [String]
+whatWentWrong logs = map getMsg $ filter bad $ inOrder $ build logs
